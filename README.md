@@ -13,7 +13,7 @@ Function<String, URL> function = URL::new;
 Function<String, URL> function = wrapFunction(URL::new);
 ```
 ## 2. 看一个更常见的例子
-在Stream的map()方法中调用了一个会抛出异常的方法，此处将一批url字符串转换成URL对象模拟这种场景：
+假设在Stream的map()方法中调用了一个会抛出异常的方法，此处将一批url字符串转换成URL对象模拟这种场景：
 ### 原代码：
 ```java
 List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
@@ -27,7 +27,7 @@ List<URL> urlList = source.stream().map(url -> {
     }
 }).collect(Collectors.toList());
 ```
-上面代码中`new URL(url)`会抛出MalformedURLException，在lambda表达式中必须被try-catch，无法向上抛出，这样不仅代码累赘，而且在实际开发中，绝大多数的异常都是需要向上抛出的，这样就无法简便的使用Stream API了。
+上面代码中`new URL(url)`会抛出`MalformedURLException`，在lambda表达式中必须被try-catch，无法向上抛出，这样不仅代码累赘，而且在实际开发中，绝大多数的异常都是需要向上抛出的，这样就无法简便的使用Stream API了。
 
 ### 使用LambdaExceptionUtil之后
 ```java
@@ -56,22 +56,24 @@ import static com.robot.LambdaExceptionUtil.wrapFunction;
 ...
 
 List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
-// 省略了类名
+// 省略了类名后
 List<URL> urlList = source.stream().map(wrapFunction(URL::new)).collect(Collectors.toList());
 ```
 
 # API
 ```
-// 最常用的4个，聪明的你一眼就能看懂怎么用吧
-wrapFunction(function);// function： 入参出参各一个
-wrapConsumer(consumer);// consumer：一个入参，没有出参
-wrapSupplier(supplier);// supplier：没有入参，一个出参
-wrapPredicate(predicate);// predicate：一个入参，一个出参，出参类型是boolean
+// 最常用的4个，聪明的你一眼就能看懂怎么用吧😉
+// 简单来说就是，原先的lambda表达式是什么类型的函数，就用这种函数对应的wrap方法就好了
+wrapFunction(Function);// Function：普通函数（入参出参各一个）
+wrapConsumer(Consumer);// Consumer：消费函数（一个入参，没有出参）
+wrapSupplier(Supplier);// Supplier：提供函数（没有入参，一个出参）
+wrapPredicate(Predicate);// Predicate：条件函数（一个入参，一个出参，且出参类型是boolean）
 
 // more
-wrapBiFunction(biFunction);
-wrapBiConsumer(biConsumer);
-wrapBiPredicate(biPredicate);
+wrapBiFunction(BiFunction);
+wrapBiConsumer(BiConsumer);
+wrapBiPredicate(BiPredicate);
+wrapRunnable(Runnable);
 
 ```
 
@@ -80,6 +82,10 @@ wrapBiPredicate(biPredicate);
 ![快捷静态导入](https://tva1.sinaimg.cn/large/006y8mN6gy1g7xqme3telj31l00a8q6c.jpg)
 
 
+
+思路源自[@MarcG](https://stackoverflow.com/users/3411681/marcg)与[@PaoloC](https://stackoverflow.com/users/2365724/paoloc)，感谢两位大神。
+
 参考：
+
 - [Java 8 Lambda function that throws exception?](https://stackoverflow.com/questions/18198176/java-8-lambda-function-that-throws-exception)
 - [How can I throw CHECKED exceptions from inside Java 8 streams?](https://stackoverflow.com/questions/27644361/how-can-i-throw-checked-exceptions-from-inside-java-8-streams)
