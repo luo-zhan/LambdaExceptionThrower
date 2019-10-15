@@ -1,7 +1,7 @@
 # LambdaExceptionUtil
-![](https://camo.githubusercontent.com/311762166ef25238116d3cadd22fcb6091edab98/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4c6963656e73652d4d49542d626c75652e737667)     
+![GitHub](https://img.shields.io/github/license/Robot-L/LambdaExceptionUtil?label=License)![GitHub last commit](https://img.shields.io/github/last-commit/Robot-L/LambdaExceptionUtil?label=Last%20commit)![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Robot-L/LambdaExceptionUtil)
 
-写Lambda表达式不想要捕获异常怎么办，试试这个！   
+用Stream API写Lambda表达式的时候遇到异常怎么办，试试这个！   
 只需一个wrap方法就能将异常冒泡抛给外层，告别lambda表达式中的try-catch，最简单优雅的处理方式。
 
 ## 使用说明
@@ -54,7 +54,6 @@ List<URL> urlList1 = source.stream()
 ```
 建议使用import static（静态导入），能将方法前的类名也省略，使得代码更加简洁：
 ```java
-    
 // 此处静态导入方法
 import static com.robot.LambdaExceptionUtil.wrapFunction;
 
@@ -67,7 +66,7 @@ List<URL> urlList = source.stream().map(wrapFunction(URL::new)).collect(Collecto
 
 ## API
 
-```
+```java
 // 最常用的4个，聪明的你一眼就能看懂怎么用吧😉
 // 简单来说就是，原先的lambda表达式是什么类型的函数，就用这种函数对应的wrap方法就好了
 wrapFunction(Function);// Function：普通函数（入参出参各一个）
@@ -87,6 +86,8 @@ wrapRunnable(Runnable);
 
 如果你使用IDEA的话，可以在代码中直接敲`wrapFunction(...)`，然后按`⌥+↩︎`(Opition+回车，Windows是Alt+回车)，选择弹出菜单中的“import static...”即可快速导入方法，其他API同理。如下图所示：
 ![快捷静态导入](https://tva1.sinaimg.cn/large/006y8mN6gy1g7xqme3telj31l00a8q6c.jpg)
+
+代码已经运行5个月，暂未发现问题，如果发现新问题请提[Issues](https://github.com/Robot-L/LambdaExceptionUtil/issues)，如果对你有帮助，请点个Star，谢谢~ ^_^
 
 
 
