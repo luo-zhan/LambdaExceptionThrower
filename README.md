@@ -70,11 +70,11 @@ List<URL> urlList = source.stream().map(wrapFunction(URL::new)).collect(Collecto
 
 ```java
 // 最常用的4个，聪明的你一眼就能看懂怎么用吧😉
-// 简单来说就是，原先的lambda表达式是什么类型的函数，就用这种函数对应的wrap方法就好了
 wrapFunction(Function);// Function：普通函数（入参出参各一个）
 wrapConsumer(Consumer);// Consumer：消费函数（一个入参，没有出参）
 wrapSupplier(Supplier);// Supplier：提供函数（没有入参，一个出参）
 wrapPredicate(Predicate);// Predicate：条件函数（一个入参，一个出参，且出参类型是boolean）
+// 简单来说就是，原先的lambda表达式是什么类型的函数，就用这种函数对应的wrap方法就好了
 
 // more
 wrapBiFunction(BiFunction);
@@ -89,8 +89,25 @@ wrapRunnable(Runnable);
 如果你使用IDEA的话，可以在代码中直接敲`wrapFunction(...)`，然后按`⌥+↩︎`(Opition+回车，Windows是Alt+回车)，选择弹出菜单中的“import static...”即可快速导入方法，其他API同理。如下图所示：
 ![快捷静态导入](https://tva1.sinaimg.cn/large/006y8mN6gy1g7xqme3telj31l00a8q6c.jpg)
 
-代码已经运行5个月，暂未发现问题，如果发现新问题请提[Issues](https://github.com/Robot-L/LambdaUtil/issues)，如果对你有帮助，请点个Star，谢谢~ ^_^
+## One more thing
 
+工具类中还提供了一个很好用的方法，`uncheck`：
+```java
+如果已知一个方法绝不会抛出所申明的异常，可以使用该方法进行包装
+如：new String(byteArr, "UTF-8")申明了UnsupportedEncodingException，
+但编码"UTF-8"是必定不会抛异常的，所以可以使用uncheck()进行包装
+
+String text = uncheck(() -> new String(byteArr, "UTF-8"));
+
+// 通过class创建对象
+Object something = uncheck(someClass::newInstance);
+// 反射获取某个类的属性，已知这个类必然含有该属性
+Field fieldFrom = uncheck(() -> someClass.getDeclaredField("memberValues"));
+```
+是不是很赞~😉   
+
+
+如果发现问题或建议请提[Issues](https://github.com/Robot-L/LambdaUtil/issues)，如果对你有帮助，请点个Star，谢谢~ ^_^
 
 
 思路源自[@MarcG](https://stackoverflow.com/users/3411681/marcg)与[@PaoloC](https://stackoverflow.com/users/2365724/paoloc)，感谢两位大神。
