@@ -22,16 +22,18 @@ Function<String, URL> function = wrapFunction(URL::new);
 #### 原代码：
 
 ```java
-List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
-List<URL> urlList = source.stream().map(url -> {
-    // 必须要捕获异常，否则无法编译通过
-    try {
-        return new URL(url);
-    } catch (MalformedURLException e) {
-        // 抛异常只能抛unchecked-exception(RuntimeException或Error)，或者处理掉异常不往上抛。
-        throw new RuntimeException(e);
-    }
-}).collect(Collectors.toList());
+public static void main(String[] args){
+    List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
+    List<URL> urlList = source.stream().map(url -> {
+        // 必须要捕获异常，否则无法编译通过
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            // 抛异常只能抛unchecked-exception(RuntimeException或Error)，或者处理掉异常不往上抛。
+            throw new RuntimeException(e);
+        }
+    }).collect(Collectors.toList());
+}
 ```
 上面代码中`new URL(url)`会抛出`MalformedURLException`，在lambda表达式中必须被try-catch，无法向上抛出，这样不仅代码累赘，而且在实际开发中，绝大多数的异常都是需要向上抛出的，这样就无法简便的使用Stream API了。
 
@@ -41,29 +43,31 @@ List<URL> urlList = source.stream().map(url -> {
 import com.robot.LambdaUtil;
 
 ...
+public static void main(String[] args) throws MalformedURLException{
+    List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
 
-List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
+    // 只需要在原来的lambda表达式外用wrapFunction()方法包裹一下即可，注意异常已经被抛到了上层，main方法签名中增加了MalformedURLException异常申明
+    List<URL> urlList = source.stream()
+        .map(LambdaUtil.wrapFunction(url->new URL(url)))
+        .collect(Collectors.toList());
 
-// 只需要在原来的lambda表达式外用wrapFunction()方法包裹一下即可
-List<URL> urlList = source.stream()
-    .map(LambdaUtil.wrapFunction(url->new URL(url)))
+    // 还可以使用method refrence 了，代码更加简洁！
+    List<URL> urlList1 = source.stream()
+    .map(LambdaUtil.wrapFunction(URL::new))
     .collect(Collectors.toList());
-
-// 还可以使用method refrence！
-List<URL> urlList1 = source.stream()
-.map(LambdaUtil.wrapFunction(URL::new))
-.collect(Collectors.toList());
+}
 ```
-建议使用import static（静态导入），能将方法前的类名也省略，使得代码更加简洁：
+建议使用import static（静态导入），能将方法前的类名也省略，达到最终的极简形式：
 ```java
 // 此处静态导入方法
 import static com.robot.LambdaUtil.wrapFunction;
 
 ...
-
-List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
-// 省略了类名后
-List<URL> urlList = source.stream().map(wrapFunction(URL::new)).collect(Collectors.toList());
+public static void main(String[] args) throws MalformedURLException{
+    List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
+    // 通过静态导入省略了类名后：
+    List<URL> urlList = source.stream().map(wrapFunction(URL::new)).collect(Collectors.toList());
+}
 ```
 
 ## API
@@ -89,6 +93,8 @@ wrapRunnable(Runnable);
 如果你使用IDEA的话，可以在代码中直接敲`wrapFunction(...)`，然后按`⌥+↩︎`(Opition+回车，Windows是Alt+回车)，选择弹出菜单中的“import static...”即可快速导入方法，其他API同理。如下图所示：
 ![快捷静态导入](https://tva1.sinaimg.cn/large/006y8mN6gy1g7xqme3telj31l00a8q6c.jpg)
 
+
+
 ## One more thing
 
 工具类中还提供了一个很好用的方法，`uncheck`：
@@ -99,18 +105,23 @@ wrapRunnable(Runnable);
 
 String text = uncheck(() -> new String(byteArr, "UTF-8"));
 
-// 通过class创建对象
+// 通过class创建对象，确保实例化不会产生异常
 Object something = uncheck(someClass::newInstance);
+
 // 反射获取某个类的属性，已知这个类必然含有该属性
 Field fieldFrom = uncheck(() -> someClass.getDeclaredField("memberValues"));
 ```
-是不是很赞~😉   
+是不是很赞~😉  
+> uncheck方法有一定的风险，因为它隐藏了可能的异常申明，导致外层不知道存在某异常也无法对该异常进行处理，所以请在使用该方法前三思，谨慎使用
+ 
 
+## Note
+本工具实现方式是利用泛型的不确定性使得编译器无法区分抛出的异常是uncheck-exception还是check-exception，利用这个漏洞绕开了编译器的检查，所以不会编译报错，然后将异常抛到外层（此时异常还是原来的异常），这和很多解决方案中的把异常转换成RuntimeException抛出的原理是不同的，有兴趣的朋友可以参看源码。
+
+思路源自[@MarcG](https://stackoverflow.com/users/3411681/marcg)与[@PaoloC](https://stackoverflow.com/users/2365724/paoloc)，感谢两位大神。
 
 如果发现问题或建议请提[Issues](https://github.com/Robot-L/LambdaUtil/issues)，如果对你有帮助，请点个Star，谢谢~ ^_^
 
-
-思路源自[@MarcG](https://stackoverflow.com/users/3411681/marcg)与[@PaoloC](https://stackoverflow.com/users/2365724/paoloc)，感谢两位大神。
 
 参考：
 
