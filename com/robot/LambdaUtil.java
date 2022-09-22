@@ -6,9 +6,9 @@ import java.util.function.*;
  * Lambda异常处理工具类
  *
  * @author luozhan
- * @create 2019-05
+ * @date 2019-05
  */
-public final class LambdaExceptionUtil {
+public class LambdaUtil {
 
     @FunctionalInterface
     public interface ConsumerWithExceptions<T, E extends Exception> {
@@ -54,9 +54,10 @@ public final class LambdaExceptionUtil {
     /**
      * 包装普通函数（Function）
      * <p>
-     * 注：方法签名中的" throws E "编译器会提示多余，但其实是为了将具体的异常向外传递，如果不抛出的话：
+     * 注：方法签名中的" throws E "编译器会提示多余，但其实是为了将实际的异常向外传递，如果不这么做：
      * 1.外层代码中编译器将无法提示有异常需要处理
-     * 2.也无法主动在外层捕获具体的异常，如果尝试try一个具体的异常，编译器将提示：在try语句体中永远不会抛出相应异常（Exception 'XXX' is never thrown in the corresponding try block）
+     * 2.也无法主动在外层捕获具体的异常，如果尝试try一个具体的异常，编译器将提示：
+     * 在try语句体中永远不会抛出相应异常（Exception 'XXX' is never thrown in the corresponding try block）
      */
     public static <T, R, E extends Exception> Function<T, R> wrapFunction(FunctionWithExceptions<T, R, E> function) throws E {
         return t -> {
@@ -164,12 +165,14 @@ public final class LambdaExceptionUtil {
     }
 
     /**
-     * 如果一个方法绝对不会抛出所申明的异常，可以使用该方法进行包装
+     * 如果一段代码确保不会抛出所申明的异常，可以使用该方法进行包装
      * 如：new String(byteArr, "UTF-8")申明了UnsupportedEncodingException，
-     * 但编码"UTF-8"是必定不会抛异常的，所以可以使用uncheck()进行包装
-     * String text = uncheck(() -> new String(byteArr, "UTF-8"))
+     * 但编码"UTF-8"是必定不会抛异常的，使用sure进行包装
+     * String text = sure(() -> new String(byteArr, "UTF-8"))
+     * <p>
+     * 注： sure方法有一定的风险，因为它隐藏了可能的异常申明，所以请谨慎使用，确保(sure)不会抛出异常才可以使用
      */
-    public static <R, E extends Exception> R uncheck(SupplierWithExceptions<R, E> supplier) {
+    public static <R, E extends Exception> R sure(SupplierWithExceptions<R, E> supplier) {
         try {
             return supplier.get();
         } catch (Exception exception) {
@@ -180,11 +183,11 @@ public final class LambdaExceptionUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static <E extends Throwable> void throwAsUnchecked(Exception exception) throws E {
+    private static <E extends Exception> void throwAsUnchecked(Exception exception) throws E {
         throw (E) exception;
     }
-   
-    private static class UnreachableException extends RuntimeException{
+
+    private static class UnreachableException extends RuntimeException {
 
     }
 
