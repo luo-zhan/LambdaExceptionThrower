@@ -99,20 +99,20 @@ wrapRunnable(Runnable);
 
 工具类中还提供了一个很好用的方法，`uncheck`：
 ```java
-如果已知一个方法绝不会抛出所申明的异常，可以使用该方法进行包装
+如果一段代码确保不会抛出所申明的异常，可以使用该方法进行包装
 如：new String(byteArr, "UTF-8")申明了UnsupportedEncodingException，
-但编码"UTF-8"是必定不会抛异常的，所以可以使用uncheck()进行包装
+但编码"UTF-8"是必定不会抛异常的，使用sure(...)进行包装
 
-String text = uncheck(() -> new String(byteArr, "UTF-8"));
+String text = sure(() -> new String(byteArr, "UTF-8"));
 
 // 通过class创建对象，确保实例化不会产生异常
-Object something = uncheck(someClass::newInstance);
+Object something = sure(someClass::newInstance);
 
 // 反射获取某个类的属性，已知这个类必然含有该属性
-Field fieldFrom = uncheck(() -> someClass.getDeclaredField("memberValues"));
+Field fieldFrom = sure(() -> someClass.getDeclaredField("memberValues"));
 ```
 是不是很赞~😉  
-> uncheck方法有一定的风险，因为它隐藏了可能的异常申明，导致外层不知道存在某异常也无法对该异常进行处理，所以请在使用该方法前三思，谨慎使用
+> sure方法有一定的风险，因为它隐藏了可能的异常申明，所以请谨慎使用，确保(sure)不会抛出异常才可以使用
  
 
 ## Note
