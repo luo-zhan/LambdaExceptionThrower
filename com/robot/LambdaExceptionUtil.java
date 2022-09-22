@@ -174,13 +174,18 @@ public final class LambdaExceptionUtil {
             return supplier.get();
         } catch (Exception exception) {
             throwAsUnchecked(exception);
-            return null;
+            // 用来解决在调用方法时提示可能NPE的警告
+            throw new UnreachableException();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <E extends Throwable> void throwAsUnchecked(Exception exception) throws E {
+    private static <E extends Throwable> void throwAsUnchecked(Exception exception) throws E {
         throw (E) exception;
+    }
+   
+    private static class UnreachableException extends RuntimeException{
+
     }
 
 }
