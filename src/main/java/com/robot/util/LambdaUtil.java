@@ -1,4 +1,4 @@
-package com.robot;
+package com.robot.util;
 
 import java.util.function.*;
 
@@ -177,7 +177,7 @@ public class LambdaUtil {
             return supplier.get();
         } catch (Exception exception) {
             throwAsUnchecked(exception);
-            // 用来解决在调用方法时提示可能NPE的警告
+            // 其实不会执行到这行来，主要是用来解决在调用方法时idea提示的可能产生NPE的警告
             throw new UnreachableException();
         }
     }

@@ -40,34 +40,36 @@ public static void main(String[] args){
 #### 使用LambdaUtil之后
 
 ```java
-import com.robot.LambdaUtil;
+
 
 ...
-public static void main(String[] args) throws MalformedURLException{
-    List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
+public static void main(String[]args)throws MalformedURLException{
+        List<String> source=Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
 
-    // 只需要在原来的lambda表达式外用wrapFunction()方法包裹一下即可，注意异常已经被抛到了上层，main方法签名中增加了MalformedURLException异常申明
-    List<URL> urlList = source.stream()
+        // 只需要在原来的lambda表达式外用wrapFunction()方法包裹一下即可，注意异常已经被抛到了上层，main方法签名中增加了MalformedURLException异常申明
+        List<URL> urlList=source.stream()
         .map(LambdaUtil.wrapFunction(url->new URL(url)))
         .collect(Collectors.toList());
 
-    // 还可以使用method refrence 了，代码更加简洁！
-    List<URL> urlList1 = source.stream()
-    .map(LambdaUtil.wrapFunction(URL::new))
-    .collect(Collectors.toList());
-}
+        // 还可以使用method refrence，代码更加简洁！
+        List<URL> urlList1=source.stream()
+        .map(LambdaUtil.wrapFunction(URL::new))
+        .collect(Collectors.toList());
+        }
 ```
 建议使用import static（静态导入），能将方法前的类名也省略，达到最终的极简形式：
+
 ```java
 // 此处静态导入方法
-import static com.robot.LambdaUtil.wrapFunction;
+
+import static com.robot.util.LambdaUtil.wrapFunction;
 
 ...
-public static void main(String[] args) throws MalformedURLException{
-    List<String> source = Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
-    // 通过静态导入省略了类名后：
-    List<URL> urlList = source.stream().map(wrapFunction(URL::new)).collect(Collectors.toList());
-}
+public static void main(String[]args)throws MalformedURLException{
+        List<String> source=Arrays.asList("http://example1.com","http://example2.com","http://example3.com");
+        // 通过静态导入省略了类名后：
+        List<URL> urlList=source.stream().map(wrapFunction(URL::new)).collect(Collectors.toList());
+        }
 ```
 
 ## API
@@ -97,7 +99,7 @@ wrapRunnable(Runnable);
 
 ## One more thing
 
-工具类中还提供了一个很好用的方法，`uncheck`：
+工具类中还提供了另一个很好用的方法，`sure`：
 ```java
 如果一段代码确保不会抛出所申明的异常，可以使用该方法进行包装
 如：new String(byteArr, "UTF-8")申明了UnsupportedEncodingException，
@@ -112,7 +114,7 @@ Object something = sure(someClass::newInstance);
 Field fieldFrom = sure(() -> someClass.getDeclaredField("memberValues"));
 ```
 是不是很赞~😉  
-> sure方法有一定的风险，因为它隐藏了可能的异常申明，所以请谨慎使用，确保(sure)不会抛出异常才可以使用
+> sure方法有一定的风险，因为它隐藏了可能的异常申明，所以请谨慎使用，确保(sure)不会抛出异常才可以使用！
  
 
 ## Note
