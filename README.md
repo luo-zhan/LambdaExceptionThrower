@@ -2,6 +2,7 @@
 
 [![GitHub](https://img.shields.io/github/license/luo-zhan/Transformer)](http://opensource.org/licenses/apache-2-0)
 [![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/luo-zhan/LambdaExceptionThrower)]()
+[![SolarLint](https://img.shields.io/badge/SolarLint-Perfect-gold)]()
 [![GitHub last commit](https://img.shields.io/github/last-commit/luo-zhan/LambdaExceptionThrower?label=Last%20commit)]()
 
 Java里写Lambda表达式的时候居然必须要try-catch掉内部异常，简直不能忍！😠
