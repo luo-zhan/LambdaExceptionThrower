@@ -8,7 +8,7 @@ import java.util.function.*;
  * @author luozhan
  * @date 2019-05
  */
-public class LambdaUtil {
+public class LambdaExceptionUtil {
 
     @FunctionalInterface
     public interface ConsumerWithExceptions<T, E extends Exception> {
@@ -57,7 +57,7 @@ public class LambdaUtil {
      * 注：方法签名中的" throws E "编译器会提示多余，但其实是为了将实际的异常向外传递，如果不这么做：
      * 1.外层代码中编译器将无法提示有异常需要处理
      * 2.也无法主动在外层捕获具体的异常，如果尝试try一个具体的异常，编译器将提示：
-     * 在try语句体中永远不会抛出相应异常（Exception 'XXX' is never thrown in the corresponding try block）
+     * Exception 'XXX' is never thrown in the corresponding try block（在try语句体中永远不会抛出相应异常）
      */
     public static <T, R, E extends Exception> Function<T, R> wrapFunction(FunctionWithExceptions<T, R, E> function) throws E {
         return t -> {
@@ -175,6 +175,19 @@ public class LambdaUtil {
     public static <R, E extends Exception> R sure(SupplierWithExceptions<R, E> supplier) {
         try {
             return supplier.get();
+        } catch (Exception exception) {
+            throwAsUnchecked(exception);
+            // 其实不会执行到这行来，主要是用来解决在调用方法时idea提示的可能产生NPE的警告
+            throw new UnreachableException();
+        }
+    }
+
+    /**
+     * 同上
+     */
+    public static <E extends Exception> void sure(RunnableWithExceptions<E> runner) {
+        try {
+            runner.run();
         } catch (Exception exception) {
             throwAsUnchecked(exception);
             // 其实不会执行到这行来，主要是用来解决在调用方法时idea提示的可能产生NPE的警告
