@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.luo-zhan</groupId>
-    <artifactId>lambda-excepton-thrower</artifactId>
+    <artifactId>lambda-exception-thrower</artifactId>
     <version>1.0.0-RELEASE</version>
     <name>LambdaExceptionThrower</name>
     <description>写Lambda表达式不想要捕获异常怎么办，试试这个吧！</description>
