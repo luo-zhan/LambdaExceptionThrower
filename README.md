@@ -1,5 +1,6 @@
 # LambdaExceptionThrower
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/cc4ff6ed92a642dbae93309ed794e04e)](https://app.codacy.com/gh/luo-zhan/LambdaExceptionThrower?utm_source=github.com&utm_medium=referral&utm_content=luo-zhan/LambdaExceptionThrower&utm_campaign=Badge_Grade)
 [![GitHub](https://img.shields.io/github/license/luo-zhan/Transformer)](http://opensource.org/licenses/apache-2-0)
 [![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/luo-zhan/LambdaExceptionThrower)]()
 [![SolarLint](https://img.shields.io/badge/SolarLint-Perfect-gold)]()
